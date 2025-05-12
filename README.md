@@ -5,21 +5,6 @@
 </div>
 
 
-<div align="center">
-	<a href="https://github.com/yulimchen/vue3-h5-template/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/yulimchen/vue3-h5-template.svg?style=flat-square" alt="license">
-  </a>
-  <a href="https://github.com/yulimchen/vue3-h5-template/releases">
-    <img src="https://img.shields.io/github/release/yulimchen/vue3-h5-template.svg?style=flat-square" alt="GitHub release">
-  </a>
-  <a href="https://github.com/yulimchen/vue3-h5-template">
-    <img src="https://img.shields.io/github/stars/yulimchen/vue3-h5-template?style=flat-square" alt="GitHub stars">
-  </a>
-  <a href="https://github.com/yulimchen/vue3-h5-template">
-    <img src="https://img.shields.io/github/forks/yulimchen/vue3-h5-template?style=flat-square" alt="GitHub forks">
-  </a>
-</div>
-
 
 <h1 align="center">Vue3 H5 Template</h1>
 
@@ -49,11 +34,6 @@
 
 
 
-## 在线预览 Preview
-
-👓 [点击这里](https://yulimchen.github.io/vue3-h5-template/)（PC浏览器请切换手机端模式）
-
-
 
 ## 运行项目
 
@@ -73,26 +53,8 @@ pnpm install
 pnpm dev
 ```
 
-[i18n](https://github.com/yulimchen/vue3-h5-template/tree/i18n) 国际化多语言版本 clone 方式
-
-```shell
-# 克隆项目
-git clone -b i18n https://github.com/yulimchen/vue3-h5-template.git
-
-# 同上进入目录&安装依赖等
-cd vue3-h5-template
-```
 
 
-如果你需要的是基于 `JavaScript` 构建的 H5 项目模板，可切换到 [js-version](https://github.com/yulimchen/vue3-h5-template/tree/js-version) 分支进行开发
-
-```shell
-# 克隆项目
-git clone -b js-version https://github.com/yulimchen/vue3-h5-template.git
-
-# 同上进入目录&安装依赖等
-cd vue3-h5-template
-```
 
 
 
@@ -256,104 +218,3 @@ router.beforeEach((to: toRouteType, from, next) => {
 具体实现方法见文件 `src/utils/set-page-title.ts` 。
 
 
-
-### <span id="mock">开发环境 Mock</span>
-
-> 本项目开发环境支持 mock 请求数据，在 `mock` 目录中可配置接口和数据，具体见[文档](https://github.com/pengzhanbo/vite-plugin-mock-dev-server/blob/main/README.zh-CN.md)。
-
-
-
-### <span id="viewport">vw 视口适配</span>
-
-使用 `cnjm-postcss-px-to-viewport` 进行视口适配，相关配置见项目根目录下 `postcss.config.js`。
-
-```js
-// postcss.config.js
-module.exports = {
-  plugins: {
-    // 使用 cnjm-postcss-px-to-viewport 规避 postcss.plugin was deprecated 警告
-    "cnjm-postcss-px-to-viewport": {
-      viewportWidth: 375, // 根据设计稿设定
-      minPixelValue: 1, // 最小的转换数值
-      unitPrecision: 2 // 转化精度，转换后保留位数
-    },
-    autoprefixer: {
-      overrideBrowserslist: ["Android >= 4.0", "iOS >= 7"]
-    }
-  }
-};
-```
-
-
-
-### <span id="tailwindcss">Tailwindcss 原子类框架</span>
-
-Tailwindcss 从 3.0 版本开始默认使用 `JIT` 模式，打包代码不再臃肿，结合 `vite` 使用非常香~ 如果你还没使用过类似的框架，Tailwindcss 首页的[示例](https://tailwindcss.com/)非常直观。
-
-官方文档：https://tailwindcss.com/docs/padding
-
-
-
-### <span id="git">Git 提交信息规范</span>
-
-项目使用 `husky` 规范 Git 提交信息，遵循社区主流的 [Angular](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-angular) 规范。
-
-```
-feat 增加新功能
-fix 修复问题/BUG
-style 代码风格相关无影响运行结果的
-perf 优化/性能提升
-refactor 重构
-revert 撤销修改
-test 测试相关
-docs 文档/注释
-chore 依赖更新/脚手架配置修改等
-workflow 工作流改进
-ci 持续集成
-types 类型定义文件更改
-wip 开发中
-```
-
-```
-// 格式
-<type>(<scope>): <subject>
-// 示例
-feat(layout): 布局完成
-```
-
-
-
-### <span id="CDN">CDN 生产环境依赖</span>
-
-本模板生产环境默认不开启 CDN 加载依赖，如需开启生产环境加载 CDN 依赖，在根目录生产环境变量文件 `.env.production` 中修改 `VITE_CDN_DEPS` 的值为 `true` 重新打包即可。
-
-
-
-## 捐赠
-
-如果本项目对你有所帮助，可以考虑赞赏一下作者 : D
-
-<div align="center">
-	<img src="docs/assets/img/donate.png" alt="donate" style="width:50%;" />
-</div>
-
-
-
-
-## 鸣谢
-
- [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) 
-
- [vant-demo](https://github.com/youzan/vant-demo) 
-
- [vue-pure-admin](https://github.com/xiaoxian521/vue-pure-admin)
-
- [vue-vben-admin](https://github.com/vbenjs/vue-vben-admin)
-
-Font Awesome Solid 图标由 [Dave Gandy](https://github.com/FortAwesome/Font-Awesome) 创作，基于 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 许可发布。
-
-
-
-## License
-
-[MIT license](https://github.com/yulimchen/vue3-h5-template/blob/master/LICENSE).
