@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import { store } from "./store";
+import { useUserStore } from "./store/user";
 // normalize.css
 import "normalize.css/normalize.css";
 // 全局样式
@@ -15,7 +16,10 @@ import router from "./router";
 initializeDarkMode();
 
 const app = createApp(App);
+
 app.use(store);
 app.use(router);
-
+// 恢复登录状态
+const userStore = useUserStore();
+userStore.loadToken();
 app.mount("#app");

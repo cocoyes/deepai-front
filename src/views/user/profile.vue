@@ -1,5 +1,20 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { defineStore } from "pinia";
+import { useRouter } from "vue-router";
+import { useUserStore } from "../../store/user";
+
+const router = useRouter();
+const userStore = useUserStore();
+
+onMounted(() => {
+  if (!userStore.isLogin) {
+    router.replace({
+      path: "/login",
+      query: { redirect: "/profile" }
+    });
+  }
+});
 
 defineOptions({ name: "ProfilePage" });
 
@@ -24,7 +39,6 @@ const posts = [
     <!-- 顶部背景图 + 头像 -->
     <div class="relative">
       <img src="~@/assets/user_ba.jpg" class="w-full h-[160px] object-cover" />
-      
     </div>
 
     <!-- 用户卡片 -->
@@ -38,7 +52,9 @@ const posts = [
         />
         <div class="flex-1">
           <div class="font-bold text-[18px]">weizhanzhan</div>
-          <div class="text-[12px] text-gray-500">🏆 年度最佳CV工程师 · 一只小前端 ✌️</div>
+          <div class="text-[12px] text-gray-500">
+            🏆 年度最佳CV工程师 · 一只小前端 ✌️
+          </div>
         </div>
       </div>
 
@@ -57,14 +73,14 @@ const posts = [
         </div>
       </div>
 
-      <div class="flex space-x-[12px] mt-[16px]">
-       
-      </div>
+      <div class="flex space-x-[12px] mt-[16px]"></div>
     </div>
 
     <!-- Tabs -->
     <div class="mt-[16px] px-[12px]">
-      <div class="flex bg-[var(--color-block-background)] rounded-[8px] overflow-hidden">
+      <div
+        class="flex bg-[var(--color-block-background)] rounded-[8px] overflow-hidden"
+      >
         <div
           v-for="(tab, index) in tabs"
           :key="index"
@@ -88,7 +104,10 @@ const posts = [
           class="bg-[var(--color-block-background)] rounded-[12px] p-[12px]"
         >
           <div class="flex items-center space-x-[8px] mb-[8px]">
-            <img src="~@/assets/user_ba.jpg" class="w-[32px] h-[32px] rounded-full" />
+            <img
+              src="~@/assets/user_ba.jpg"
+              class="w-[32px] h-[32px] rounded-full"
+            />
             <div>
               <div class="text-[14px] font-medium">{{ post.user }}</div>
               <div class="text-[12px] text-gray-400">{{ post.time }} 发布</div>
@@ -107,9 +126,18 @@ const posts = [
           </div>
 
           <div class="flex justify-around text-[13px] text-gray-500">
-            <div><svg-icon name="like" class="text-[16px] mr-[4px]" /> {{ post.likes }}</div>
-            <div><svg-icon name="comment" class="text-[16px] mr-[4px]" /> {{ post.comments }}</div>
-            <div><svg-icon name="star" class="text-[16px] mr-[4px]" /> {{ post.stars }}</div>
+            <div>
+              <svg-icon name="like" class="text-[16px] mr-[4px]" />
+              {{ post.likes }}
+            </div>
+            <div>
+              <svg-icon name="comment" class="text-[16px] mr-[4px]" />
+              {{ post.comments }}
+            </div>
+            <div>
+              <svg-icon name="star" class="text-[16px] mr-[4px]" />
+              {{ post.stars }}
+            </div>
           </div>
         </div>
       </div>

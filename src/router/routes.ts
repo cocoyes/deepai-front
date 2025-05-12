@@ -1,18 +1,18 @@
 import Layout from "@/layout/index.vue";
 import type { RouteRecordRaw } from "vue-router";
-import Demo from "@/views/demo/index.vue";
+import Demo from "@/views/index.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "root",
     component: Layout,
-    redirect: { name: "Demo" },
+    redirect: { name: "Index" },
     children: [
       {
-        path: "demo",
-        name: "Demo",
-        component: Demo,
+        path: "index",
+        name: "Index",
+        component: () => import("@/views/index.vue"),
         meta: {
           title: "主页"
         }
@@ -26,11 +26,29 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: "about",
-        name: "About",
-        component: () => import("@/views/about/index.vue"),
+        path: "profile",
+        name: "Profile",
+        component: () => import("@/views/user/profile.vue"),
         meta: {
-          title: "关于",
+          title: "我的",
+          noCache: true
+        }
+      },
+      {
+        path: "login",
+        name: "Login",
+        component: () => import("@/views/login.vue"),
+        meta: {
+          title: "登录",
+          noCache: true
+        }
+      },
+      {
+        path: "register",
+        name: "Register",
+        component: () => import("@/views/register.vue"),
+        meta: {
+          title: "注册账号",
           noCache: true
         }
       }
