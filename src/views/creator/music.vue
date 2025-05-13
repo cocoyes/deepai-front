@@ -2,15 +2,20 @@
 import { ref } from "vue";
 import { showFailToast, showSuccessToast } from "vant";
 import MusicList from "@/components/musicList.vue";
+import { createMusic } from "@/api/music";
 defineOptions({ name: "TextToMusic" });
 
 const activeTab = ref(0); // 0: AI模型，1: 自定义模型
 const prompt = ref("");
-const selectedModel = ref(""); // 自定义模型选项
+
 const showModelSelector = ref(false);
-const customModels = ["模型A", "模型B", "模型C"]; // 假数据，可替换为接口请求数据
 const musicGroupId = ref<string | null>(null);
-function generateMusic() {
+
+interface CreateMusic {
+  prompt: string;
+  modelId: string;
+}
+async function generateMusic() {
   if (!prompt.value) {
     showFailToast("请输入提示词");
     return;
@@ -20,13 +25,32 @@ function generateMusic() {
     showFailToast("请选择自定义模型");
     return;
   }
-  musicGroupId.value=prompt.value;
+
+  const params: CreateMusic = {
+    prompt: prompt.value,
+    modelId:
+      activeTab.value === 0
+        ? "" // 默认AI模型的ID
+        : selectedModel.value!.id
+  };
+  //const orderId = await createMusic(params);
+  const orderId = "313079579228540928";
+  musicGroupId.value = orderId.toString();
   // 发起请求逻辑
   showSuccessToast(`正在生成音乐`);
 }
+
+const selectedModel = ref<{ id: string; modelName: string } | null>(null);
+const selectedModelName = ref(""); // 用于显示在字段中
+const customModels = [
+  { id: "model_a", modelName: "模型A" },
+  { id: "model_b", modelName: "模型B" },
+  { id: "model_c", modelName: "模型C" }
+];
 function onSelectModel({ name, index }: { name: string; index: number }) {
-  console.log("choose", name, index);
-  selectedModel.value = customModels[index];
+  const model = customModels[index];
+  selectedModel.value = model;
+  selectedModelName.value = model.modelName;
   showModelSelector.value = false;
 }
 </script>
@@ -44,7 +68,7 @@ function onSelectModel({ name, index }: { name: string; index: number }) {
           rows="6"
           class="my-[10px]"
         />
-        
+
         <van-button type="primary" block @click="generateMusic">
           生成音乐
         </van-button>
@@ -52,7 +76,7 @@ function onSelectModel({ name, index }: { name: string; index: number }) {
 
       <van-tab title="自定义模型">
         <van-field
-          v-model="selectedModel"
+          v-model="selectedModelName"
           label="选择模型"
           is-link
           readonly
@@ -60,10 +84,15 @@ function onSelectModel({ name, index }: { name: string; index: number }) {
           @click="showModelSelector = true"
           class="my-[10px]"
         />
-        <!-- 弹出 ActionSheet 选择模型 -->
+
         <van-action-sheet
           v-model:show="showModelSelector"
-          :actions="customModels.map((name, index) => ({ name, index }))"
+          :actions="
+            customModels.map((item, index) => ({
+              name: item.modelName,
+              index
+            }))
+          "
           @select="onSelectModel"
           cancel-text="取消"
         />

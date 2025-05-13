@@ -22,7 +22,7 @@ const routes: Array<RouteRecordRaw> = [
         name: "Music",
         component: () => import("@/views/creator/music.vue"),
         meta: {
-          title: "工具"
+          title: "创作"
         }
       },
       {
