@@ -8,6 +8,9 @@ const router = useRouter();
 const userStore = useUserStore();
 const nickName = ref("");
 const signature = ref("");
+const point = ref(0);
+const musicCount = ref(0);
+const modelCount = ref(0);
 onMounted(async () => {
   if (!userStore.isLogin) {
     router.replace({
@@ -18,6 +21,9 @@ onMounted(async () => {
     const res = await getProfile();
     nickName.value = res.nickName;
     signature.value = res.signature;
+    musicCount.value = res.musicCount;
+    point.value = res.point;
+    modelCount.value = res.modelCount;
   }
 });
 
@@ -25,6 +31,10 @@ defineOptions({ name: "ProfilePage" });
 
 const tabs = ref(["作品", "模型"]);
 const active = ref(0);
+
+function goToRedeem() {
+  router.push("/redeem");
+}
 
 const posts = [
   {
@@ -58,27 +68,32 @@ const posts = [
         <div class="flex-1">
           <div class="font-bold text-[18px]">{{ nickName }}</div>
           <div class="text-[12px] text-gray-500">
-             {{ signature }}
+            {{ signature }}
           </div>
         </div>
       </div>
 
       <div class="flex justify-around mt-[16px] text-center text-[12px]">
         <div>
-          <div class="font-bold text-[16px]">0</div>
-          <div class="text-gray-500">粉丝</div>
+          <div class="font-bold text-[16px]">{{ point }}</div>
+          <div class="text-gray-500">积分</div>
         </div>
         <div>
-          <div class="font-bold text-[16px]">0</div>
-          <div class="text-gray-500">关注</div>
+          <div class="font-bold text-[16px]">{{ musicCount }}</div>
+          <div class="text-gray-500">作品</div>
         </div>
         <div>
-          <div class="font-bold text-[16px]">0</div>
-          <div class="text-gray-500">获赞</div>
+          <div class="font-bold text-[16px]">{{ modelCount }}</div>
+          <div class="text-gray-500">模型</div>
         </div>
       </div>
 
-      <div class="flex space-x-[12px] mt-[16px]"></div>
+      <div class="flex space-x-[12px] mt-[16px]">
+        <van-button type="primary" @click="goToRedeem" block
+          >兑换积分</van-button
+        >
+        <van-button type="default" block>购买积分</van-button>
+      </div>
     </div>
 
     <!-- Tabs -->

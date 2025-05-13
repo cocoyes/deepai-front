@@ -51,6 +51,15 @@ const routes: Array<RouteRecordRaw> = [
           title: "注册账号",
           noCache: true
         }
+      },
+      {
+        path: "redeem",
+        name: "Redeem",
+        component: () => import("@/views/user/couponExchange.vue"),
+        meta: {
+          title: "积分兑换",
+          noCache: true
+        }
       }
     ]
   }
