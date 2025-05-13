@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import { showToast } from "vant";
+import { nextTick, reactive, ref } from "vue";
+import { showFailToast, showSuccessToast } from "vant";
 import GridPatternDashed from "@/components/grid-pattern/grid-pattern-dashed.vue";
 import { useRouter } from "vue-router";
+import { register,login } from "@/api/user";
+import { useUserStore } from "@/store/user";
+
+const userStore = useUserStore();
 const router = useRouter();
 
 function goRegister() {
@@ -22,21 +26,25 @@ const captchaSrc = ref(getCaptchaUrl());
 
 function getCaptchaUrl() {
   // 时间戳防止缓存
-  return `/api/captcha/image?ts=${Date.now()}`;
+  return `/ai-api/user/getCaptcha?ts=${Date.now()}`;
 }
 
 function refreshCaptcha() {
   captchaSrc.value = getCaptchaUrl();
 }
 
-function onLogin() {
+async function onLogin() {
   if (!form.username || !form.password || !form.captcha) {
-    showToast("请填写完整信息");
+    showFailToast("请填写完整信息");
     return;
   }
-
   // 示例登录逻辑，可换成实际接口调用
-  showToast(`登录中: ${form.username}`);
+  showSuccessToast(`登录中: ${form.username}`);
+  const token = await login(form)
+  console.log("token=",token)
+  userStore.setToken(token.token)
+  router.replace("/profile");
+
 }
 </script>
 
@@ -82,7 +90,7 @@ function onLogin() {
         <img
           :src="captchaSrc"
           @click="refreshCaptcha"
-          class="w-[100px] h-[36px] rounded ml-[12px] border border-[var(--color-border)] object-cover"
+          class="w-[80px] h-[36px] rounded ml-[12px] border border-[var(--color-border)] object-cover"
           alt="验证码"
         />
       </div>

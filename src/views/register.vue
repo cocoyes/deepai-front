@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive } from "vue";
-import { showToast } from "vant";
+import { showFailToast, showSuccessToast } from "vant";
 import GridPatternDashed from "@/components/grid-pattern/grid-pattern-dashed.vue";
 import { useRouter } from "vue-router";
-
+import { register,login } from "@/api/user";
 defineOptions({ name: "RegisterPage" });
 
 const router = useRouter();
@@ -16,22 +16,24 @@ const form = reactive({
   email: ""
 });
 
-function onRegister() {
+async function onRegister() {
   const { username, password, confirmPassword, phone, email } = form;
 
   if (!username || !password || !confirmPassword || !phone || !email) {
-    showToast("请填写完整信息");
+    showFailToast("请填写完整信息");
     return;
   }
 
   if (password !== confirmPassword) {
-    showToast("两次密码不一致");
+    showFailToast("两次密码不一致");
     return;
   }
 
+  const result = await register(form)
   // 这里应该调用注册接口
-  showToast(`注册成功: ${username}`);
+  showSuccessToast(`注册成功: ${username}`);
   router.replace("/login");
+  
 }
 </script>
 

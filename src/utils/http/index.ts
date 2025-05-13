@@ -8,11 +8,13 @@ import { ContentTypeEnum, ResultEnum } from "@/enums/request-enum";
 import NProgress from "../progress";
 import { showFailToast } from "vant";
 import "vant/es/toast/style";
+import { useUserStore } from "@/store/user";
+import router from "@/router";
 
 // 默认 axios 实例请求配置
 const configDefault = {
   headers: {
-    "Content-Type": ContentTypeEnum.FORM_URLENCODED
+    "Content-Type": ContentTypeEnum.JSON
   },
   timeout: 0,
   baseURL: import.meta.env.VITE_BASE_API,
@@ -30,10 +32,10 @@ class Http {
     Http.axiosInstance.interceptors.request.use(
       config => {
         NProgress.start();
-        // 发送请求前，可在此携带 token
-        // if (token) {
-        //   config.headers['token'] = token
-        // }
+        const userStore = useUserStore();
+        if (userStore.token) {
+          config.headers['DeepToken'] = `${userStore.token}`;
+        }
         return config;
       },
       (error: AxiosError) => {
@@ -49,18 +51,15 @@ class Http {
       (response: AxiosResponse) => {
         NProgress.done();
         // 与后端协定的返回字段
-        const { code, result } = response.data;
+        const { code, msg, data } = response.data;
         // const { message } = response.data;
         // 判断请求是否成功
-        const isSuccess =
-          result &&
-          Reflect.has(response.data, "code") &&
-          code === ResultEnum.SUCCESS;
+        const isSuccess = Reflect.has(response.data, "code") && code === ResultEnum.SUCCESS;
         if (isSuccess) {
-          return result;
+          return data;
         } else {
           // 处理请求错误
-          // showFailToast(message);
+          showFailToast(msg || "请求失败");
           return Promise.reject(response.data);
         }
       },
@@ -76,6 +75,12 @@ class Http {
             break;
           case 401:
             message = "未授权，请登录";
+            const userStore = useUserStore();
+            userStore.logout(); // 清除 token
+            router.replace({
+              path: "/login",
+              query: { redirect: router.currentRoute.value.fullPath }
+            });
             break;
           case 403:
             message = "拒绝访问";

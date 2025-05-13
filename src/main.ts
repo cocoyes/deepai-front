@@ -12,6 +12,7 @@ import "virtual:svg-icons-register";
 import { initializeDarkMode } from "@/utils/dark-mode";
 import App from "./App.vue";
 import router from "./router";
+import { Toast } from 'vant'
 
 initializeDarkMode();
 
@@ -22,4 +23,5 @@ app.use(router);
 // 恢复登录状态
 const userStore = useUserStore();
 userStore.loadToken();
+app.use(Toast)
 app.mount("#app");

@@ -18,9 +18,9 @@ const routes: Array<RouteRecordRaw> = [
         }
       },
       {
-        path: "tools",
-        name: "Tools",
-        component: () => import("@/views/tools/index.vue"),
+        path: "music",
+        name: "Music",
+        component: () => import("@/views/creator/music.vue"),
         meta: {
           title: "工具"
         }

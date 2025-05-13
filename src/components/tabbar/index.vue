@@ -24,10 +24,10 @@ const tabbarData = reactive([
     }
   },
   {
-    icon: "gem-o",
-    title: "工具",
+    icon: "fire-o",
+    title: "创作",
     to: {
-      name: "Tools"
+      name: "Music"
     }
   },
   {

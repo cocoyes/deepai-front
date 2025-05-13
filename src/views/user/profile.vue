@@ -3,22 +3,27 @@ import { ref, onMounted } from "vue";
 import { defineStore } from "pinia";
 import { useRouter } from "vue-router";
 import { useUserStore } from "../../store/user";
-
+import { getProfile } from "@/api/user";
 const router = useRouter();
 const userStore = useUserStore();
-
-onMounted(() => {
+const nickName = ref("");
+const signature = ref("");
+onMounted(async () => {
   if (!userStore.isLogin) {
     router.replace({
       path: "/login",
       query: { redirect: "/profile" }
     });
+  } else {
+    const res = await getProfile();
+    nickName.value = res.nickName;
+    signature.value = res.signature;
   }
 });
 
 defineOptions({ name: "ProfilePage" });
 
-const tabs = ref(["作品", "收藏"]);
+const tabs = ref(["作品", "模型"]);
 const active = ref(0);
 
 const posts = [
@@ -51,24 +56,24 @@ const posts = [
           class="w-[64px] h-[64px] rounded-full border border-[var(--color-border)]"
         />
         <div class="flex-1">
-          <div class="font-bold text-[18px]">weizhanzhan</div>
+          <div class="font-bold text-[18px]">{{ nickName }}</div>
           <div class="text-[12px] text-gray-500">
-            🏆 年度最佳CV工程师 · 一只小前端 ✌️
+             {{ signature }}
           </div>
         </div>
       </div>
 
       <div class="flex justify-around mt-[16px] text-center text-[12px]">
         <div>
-          <div class="font-bold text-[16px]">30</div>
+          <div class="font-bold text-[16px]">0</div>
           <div class="text-gray-500">粉丝</div>
         </div>
         <div>
-          <div class="font-bold text-[16px]">20</div>
+          <div class="font-bold text-[16px]">0</div>
           <div class="text-gray-500">关注</div>
         </div>
         <div>
-          <div class="font-bold text-[16px]">1K+</div>
+          <div class="font-bold text-[16px]">0</div>
           <div class="text-gray-500">获赞</div>
         </div>
       </div>
