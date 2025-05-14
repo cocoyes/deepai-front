@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { defineStore } from "pinia";
-import { useRouter } from "vue-router";
+import { useRouter, onBeforeRouteLeave } from "vue-router";
 import { useUserStore } from "../../store/user";
-import { getProfile } from "@/api/user";
+import { showFailToast, showSuccessToast } from "vant";
+import { getProfile, getMySongs, UserSong } from "@/api/user";
+
 const router = useRouter();
 const userStore = useUserStore();
 const nickName = ref("");
@@ -11,6 +13,33 @@ const signature = ref("");
 const point = ref(0);
 const musicCount = ref(0);
 const modelCount = ref(0);
+
+const songList = ref<UserSong[]>([]);
+const hasMore = ref(true);
+const loading = ref(false);
+
+const loadSongs = async (isInit = false) => {
+  if (!hasMore.value || loading.value) return;
+  loading.value = true;
+
+  try {
+    const ts =
+      isInit || songList.value.length === 0
+        ? undefined
+        : songList.value[songList.value.length - 1].createTimeStamp;
+    const songs = await getMySongs(ts ? { ts } : {});
+    if (songs.length === 0) {
+      hasMore.value = false;
+    } else {
+      songList.value.push(...songs);
+    }
+  } catch (err) {
+    showFailToast("加载失败");
+  } finally {
+    loading.value = false;
+  }
+};
+
 onMounted(async () => {
   if (!userStore.isLogin) {
     router.replace({
@@ -24,8 +53,28 @@ onMounted(async () => {
     musicCount.value = res.musicCount;
     point.value = res.point;
     modelCount.value = res.modelCount;
+    await loadSongs(true);
   }
+
+  window.addEventListener("scroll", handleScroll);
 });
+
+onBeforeRouteLeave(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
+
+const handleScroll = () => {
+  const scrollTop =
+    window.pageYOffset ||
+    document.documentElement.scrollTop ||
+    document.body.scrollTop;
+  const windowHeight = window.innerHeight;
+  const documentHeight = document.documentElement.scrollHeight;
+
+  if (scrollTop + windowHeight + 100 >= documentHeight) {
+    loadSongs();
+  }
+};
 
 defineOptions({ name: "ProfilePage" });
 
@@ -36,36 +85,65 @@ function goToRedeem() {
   router.push("/redeem");
 }
 
-const posts = [
-  {
-    id: "123", // 用于跳转详情页
-    user: "weizhanzhan",
-    time: "12-11",
-    text: "冬天总是爱犯困 🥱",
-    images: ["~@/assets/user_ba.jpg", "~@/assets/user_ba.jpg"],
-    musicUrl: "https://example.com/music.mp3" // 下载链接
-  }
-];
-
 function goToDetail(id: string) {
   router.push(`/play/${id}`);
 }
 
 function sharePost(id: string) {
   const url = `${window.location.origin}/play/${id}`;
-  navigator.clipboard.writeText(url).then(() => {
-    // 可以用 Toast 提示
-    alert("链接已复制到剪贴板");
-  });
+
+  const textarea = document.createElement("textarea");
+  textarea.value = url;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  textarea.style.top = "0";
+  textarea.style.opacity = "0";
+
+  document.body.appendChild(textarea);
+
+  const selectedRange = document.getSelection()?.rangeCount
+    ? document.getSelection()?.getRangeAt(0)
+    : null;
+
+  textarea.select();
+
+  try {
+    const success = document.execCommand("copy");
+    if (success) {
+      showSuccessToast("链接已复制到剪贴板");
+    } else {
+      showFailToast("复制失败");
+    }
+  } catch (e) {
+    showFailToast("复制失败");
+  }
+
+  document.body.removeChild(textarea);
+
+  if (selectedRange) {
+    const selection = document.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(selectedRange);
+  }
 }
 
-function downloadMusic(url: string) {
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = ""; // 如果服务器有 Content-Disposition 可省略，否则可填写文件名
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+function downloadMusic(url: string, filename: string = "music.mp3") {
+  if (!url) {
+    showFailToast("暂无音频可下载");
+    return;
+  }
+
+  const encodedFilename = encodeURIComponent(filename);
+  const separator = url.includes("?") ? "&" : "?";
+  const downloadUrl = `${url}${separator}attname=${encodedFilename}`;
+
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 </script>
 
@@ -136,52 +214,67 @@ function downloadMusic(url: string) {
         </div>
       </div>
 
-      <!-- 动态列表 -->
+      <!-- 音乐列表 -->
       <div v-if="active === 0" class="mt-[12px] space-y-[12px] pb-[20px]">
         <div
-          v-for="(post, i) in posts"
-          :key="i"
+          v-for="(post, i) in songList"
+          :key="post.id"
           class="bg-[var(--color-block-background)] rounded-[12px] p-[12px]"
         >
-          <div class="flex items-center space-x-[8px] mb-[8px]">
-            <img
-              src="~@/assets/user_ba.jpg"
-              class="w-[32px] h-[32px] rounded-full"
-            />
+          <div
+            @click="goToDetail(post.id)"
+            class="flex items-center space-x-[8px] mb-[8px]"
+          >
+            <img :src="post.imageUrl" class="w-[32px] h-[32px] rounded-full" />
             <div>
-              <div class="text-[14px] font-medium">{{ post.user }}</div>
-              <div class="text-[12px] text-gray-400">{{ post.time }} 创作</div>
+              <div class="text-[14px] font-medium">{{ post.title }}</div>
+              <div class="text-[12px] text-gray-400">
+                {{ new Date(post.createTime).toLocaleString() }} 创作
+              </div>
             </div>
           </div>
 
-          <div class="text-[14px] mb-[8px] leading-[20px]">{{ post.text }}</div>
-
-          <div class="grid grid-cols-2 gap-[8px] mb-[8px]">
-            <img
-              v-for="(img, idx) in post.images"
-              :key="idx"
-              :src="img"
-              class="rounded-[8px]"
-            />
+          <div
+            @click="goToDetail(post.id)"
+            class="text-[13px] text-gray-600 line-clamp-2"
+          >
+            {{ post.prompt }}
           </div>
 
-           <!-- 替换原有的点赞评论收藏 -->
-  <div class="flex justify-around text-[13px] text-gray-500 mt-[8px]">
-  <div @click.stop="sharePost(post.id)" class="flex items-center space-x-1">
-    <van-icon name="share-o" />
-    <span></span>
-  </div>
-  <div @click.stop="downloadMusic(post.musicUrl)" class="flex items-center space-x-1">
-    <van-icon name="down" />
-    <span></span>
-  </div>
-</div>
+          <div class="flex justify-around text-[13px] text-gray-500 mt-[8px]">
+            <div
+              @click.stop="sharePost(post.id)"
+              class="flex items-center space-x-1"
+            >
+              <van-icon name="share-o" />
+              <span>分享</span>
+            </div>
+            <div
+              @click.stop="downloadMusic(post.musicUrl, post.title + '.mp3')"
+              class="flex items-center space-x-1"
+            >
+              <van-icon name="down" />
+              <span>下载</span>
+            </div>
+          </div>
+        </div>
+        <div
+          v-if="loading"
+          class="text-center text-gray-400 text-[13px] mt-[12px]"
+        >
+          正在加载更多...
+        </div>
+        <div
+          v-if="!hasMore && songList.length > 0"
+          class="text-center text-gray-400 text-[13px] mt-[12px]"
+        >
+          没有更多作品了
         </div>
       </div>
 
-      <!-- 话题 tab -->
+      <!-- 模型 tab -->
       <div v-else class="text-center text-gray-400 text-[14px] mt-[24px]">
-        暂无话题
+        暂无模型
       </div>
     </div>
   </div>
