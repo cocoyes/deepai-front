@@ -16,7 +16,9 @@ interface CreateMusic {
   modelId: string;
 }
 async function generateMusic() {
+  console.log("click")
   if (!prompt.value) {
+     console.log("click2")
     showFailToast("请输入提示词");
     return;
   }
@@ -34,10 +36,10 @@ async function generateMusic() {
         : selectedModel.value!.id
   };
   //const orderId = await createMusic(params);
-  const orderId = "313079579228540928";
+  //313079579228540928
+  const orderId ="313079579228540928" ;
   musicGroupId.value = orderId.toString();
-  // 发起请求逻辑
-  showSuccessToast(`正在生成音乐`);
+   console.log("click3")
 }
 
 const selectedModel = ref<{ id: string; modelName: string } | null>(null);

@@ -60,6 +60,15 @@ const routes: Array<RouteRecordRaw> = [
           title: "积分兑换",
           noCache: true
         }
+      },
+      {
+        path: "/play/:id",
+        name: "Play",
+        component: () => import("@/views/musicPlay.vue"),
+        meta: {
+          title: "音乐播放",
+          noCache: true
+        }
       }
     ]
   }

@@ -37,3 +37,30 @@ export function queryMusicProgress(params?: object): Promise<UserOrdersVo> {
     params
   });
 }
+
+
+
+export interface UserSongDetailVo {
+  id: string;
+  userId: string;             // 用户ID
+  createTime: string;         // 创建时间（ISO 格式字符串，如 "2025-05-14T10:00:00Z"）
+  createTimeStamp: number;    // 创建时间戳（毫秒）
+  sourceText: string;         // 源文本
+  musicUrl: string;           // 用户音频链接
+  audioUrl: string;           // AI音频链接
+  imageUrl: string;           // 封面图链接
+  lyrics: string;             // 歌词
+  title: string;              // 标题
+  tags: string;               // 标签
+  userModelName: string;      // 用户模型名称
+  creatorNickName: string;    // 创建者昵称
+}
+
+
+export function getMusicDetail(params?: object): Promise<UserSongDetailVo> {
+  return http.request({
+    url: "/song/getMusicDetail",
+    method: "get",
+    params
+  });
+}

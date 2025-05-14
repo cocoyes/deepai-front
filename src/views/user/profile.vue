@@ -38,15 +38,35 @@ function goToRedeem() {
 
 const posts = [
   {
+    id: "123", // 用于跳转详情页
     user: "weizhanzhan",
     time: "12-11",
     text: "冬天总是爱犯困 🥱",
     images: ["~@/assets/user_ba.jpg", "~@/assets/user_ba.jpg"],
-    likes: 79,
-    comments: 12,
-    stars: 10
+    musicUrl: "https://example.com/music.mp3" // 下载链接
   }
 ];
+
+function goToDetail(id: string) {
+  router.push(`/play/${id}`);
+}
+
+function sharePost(id: string) {
+  const url = `${window.location.origin}/play/${id}`;
+  navigator.clipboard.writeText(url).then(() => {
+    // 可以用 Toast 提示
+    alert("链接已复制到剪贴板");
+  });
+}
+
+function downloadMusic(url: string) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = ""; // 如果服务器有 Content-Disposition 可省略，否则可填写文件名
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
 </script>
 
 <template>
@@ -130,7 +150,7 @@ const posts = [
             />
             <div>
               <div class="text-[14px] font-medium">{{ post.user }}</div>
-              <div class="text-[12px] text-gray-400">{{ post.time }} 发布</div>
+              <div class="text-[12px] text-gray-400">{{ post.time }} 创作</div>
             </div>
           </div>
 
@@ -145,20 +165,17 @@ const posts = [
             />
           </div>
 
-          <div class="flex justify-around text-[13px] text-gray-500">
-            <div>
-              <svg-icon name="like" class="text-[16px] mr-[4px]" />
-              {{ post.likes }}
-            </div>
-            <div>
-              <svg-icon name="comment" class="text-[16px] mr-[4px]" />
-              {{ post.comments }}
-            </div>
-            <div>
-              <svg-icon name="star" class="text-[16px] mr-[4px]" />
-              {{ post.stars }}
-            </div>
-          </div>
+           <!-- 替换原有的点赞评论收藏 -->
+  <div class="flex justify-around text-[13px] text-gray-500 mt-[8px]">
+  <div @click.stop="sharePost(post.id)" class="flex items-center space-x-1">
+    <van-icon name="share-o" />
+    <span></span>
+  </div>
+  <div @click.stop="downloadMusic(post.musicUrl)" class="flex items-center space-x-1">
+    <van-icon name="down" />
+    <span></span>
+  </div>
+</div>
         </div>
       </div>
 
