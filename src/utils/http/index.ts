@@ -77,10 +77,7 @@ class Http {
             message = "未授权，请登录";
             const userStore = useUserStore();
             userStore.logout(); // 清除 token
-            router.replace({
-              path: "/login",
-              query: { redirect: router.currentRoute.value.fullPath }
-            });
+            router.replace("/login");
             break;
           case 403:
             message = "拒绝访问";

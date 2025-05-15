@@ -59,3 +59,11 @@ export function getMySongs(params?: object): Promise<UserSong[]> {
     params
   });
 }
+
+export function updateRelease(data?: object): Promise<string> {
+  return http.request({
+    url: "/song/updateRelease",
+    method: "post",
+    data
+  });
+}

@@ -64,3 +64,29 @@ export function getMusicDetail(params?: object): Promise<UserSongDetailVo> {
     params
   });
 }
+
+export interface UserSongWithNickName {
+  id: string;
+  userId: string;
+  modeId: string;
+  musicUrl: string;
+  audioUrl: string;
+  imageUrl: string;
+  createTime: string;         // 时间类型一般在前后端用ISO字符串
+  createTimeStamp: number;    // int64 对应 number
+  lyrics: string;
+  title: string;
+  tags: string;
+  prompt: string;
+  releaseStatus: number;
+  deleteStatus: number;
+  nickName: string;
+}
+
+export function getOpenReleaseSongs(params?: object): Promise<UserSongWithNickName[]> {
+  return http.request({
+    url: "/song/getOpenReleaseSongs",
+    method: "get",
+    params
+  });
+}

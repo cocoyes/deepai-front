@@ -1,70 +1,77 @@
 <script setup lang="ts">
-import { reactive } from "vue";
-import GridPatternDashed from "@/components/grid-pattern/grid-pattern-dashed.vue";
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { getOpenReleaseSongs, type UserSongWithNickName } from "@/api/music";
 
-defineOptions({
-  name: "Index"
-});
+const songs = ref<UserSongWithNickName[]>([]);
+const router = useRouter();
 
-const contentList = reactive([
-  { text: "⚡ Vue3 + Vite5", fullWidth: false },
-  { text: "🍕 TypeScript", fullWidth: false },
-  { text: "✨ Vant4 组件库", fullWidth: false },
-  { text: "🍍 Pinia 状态管理", fullWidth: false },
-  { text: "🌀 Tailwindcss 原子类框架", fullWidth: true },
-  { text: "🗺️ Vue-router 4", fullWidth: false },
-  { text: "👏 集成多种图标方案", fullWidth: false },
-  { text: "🔧 集成 ESLint", fullWidth: false },
-  { text: "🌓 支持深色模式", fullWidth: false },
-  { text: "📏 vmin 视口适配", fullWidth: false },
-  { text: "📡 Axios 封装", fullWidth: false },
-  { text: "📦 打包资源 gzip 压缩", fullWidth: false },
-  { text: "🛠️ 开发 Mock 数据", fullWidth: false },
-  { text: "🚀 首屏加载动画", fullWidth: false },
-  { text: "🔍 开发环境调试面板", fullWidth: false }
-]);
+const fetchSongs = async () => {
+  try {
+    const res = await getOpenReleaseSongs();
+    songs.value = res;
+  } catch (err) {
+    console.error("获取推荐音乐失败", err);
+  }
+};
+
+onMounted(fetchSongs);
+
+const goToDetail = (id: string) => {
+  router.push(`/play/${id}`);
+};
 </script>
 
 <template>
-  <GridPatternDashed />
-  <div class="demo-content px-[12px]">
-    <img
-      class="block w-[120px] mx-auto mb-[30px] pt-[40px]"
-      alt="Vue logo"
-      src="~@/assets/logo_melomini.png"
-    />
-    <div
-      class="text-[14px] py-[12px] px-[20px] rounded-[12px] bg-[var(--color-block-background)] mt-[14px]"
-    >
-      <div>
-        <a
-          class="flex items-center"
-          href="https://github.com/yulimchen/vue3-h5-template"
-          target="_blank"
-        >
-          <svg-icon class="text-[20px] mr-[8px]" name="github" />
-          <h3 class="font-bold text-[18px] my-[4px]">Vue3-h5-template</h3>
-          <svg-icon class="text-[12px] ml-[5px]" name="link" />
-        </a>
-      </div>
-      <p class="leading-[24px] my-[6px]">
-        🌱 基于 Vue3 全家桶、TypeScript、Vite 构建工具，开箱即用的 H5
-        移动端项目基础模板
-      </p>
-    </div>
+  <div class="p-4 sm:p-6 md:p-10">
+  <!-- 页面标题 -->
+<h2
+  class="text-3xl md:text-4xl font-extrabold text-center mb-8
+         text-gray-900 dark:text-gray-100 tracking-wide"
+>
+  <p class="text-sm text-gray-600 dark:text-gray-400 text-center mt-[-12px] mb-6">
+  Discover the sound that moves you
+</p>
+</h2>
 
-    <div
-      class="mt-[16px] pb-[24px] grid grid-cols-2 gap-[12px] text-[14px] text-center"
-    >
+    <!-- 网格音乐展示 -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-5">
       <div
-        v-for="item in contentList"
-        :key="item.text"
-        :class="[
-          'truncate p-[12px] rounded-[12px] border border-[var(--color-border)]',
-          item.fullWidth ? 'col-span-2' : ''
-        ]"
+        v-for="song in songs"
+        :key="song.id"
+        class="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-white dark:bg-[#1e1e1e] cursor-pointer group"
+        @click="goToDetail(song.id)"
       >
-        {{ item.text }}
+        <!-- 封面图 -->
+        <div class="relative">
+          <img
+            :src="song.imageUrl || '/default-cover.jpg'"
+            alt="封面"
+            class="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+          <!-- 播放图标 -->
+          <div
+            class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-40 transition duration-300"
+          >
+            <svg
+              class="w-10 h-10 text-white opacity-0 group-hover:opacity-100"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- 音乐信息 -->
+        <div class="p-3">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+            {{ song.title }}
+          </h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+            by {{ song.nickName }}
+          </p>
+        </div>
       </div>
     </div>
   </div>

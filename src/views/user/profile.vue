@@ -4,7 +4,7 @@ import { defineStore } from "pinia";
 import { useRouter, onBeforeRouteLeave } from "vue-router";
 import { useUserStore } from "../../store/user";
 import { showFailToast, showSuccessToast } from "vant";
-import { getProfile, getMySongs, UserSong } from "@/api/user";
+import { getProfile, getMySongs, UserSong,updateRelease } from "@/api/user";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -19,9 +19,10 @@ const hasMore = ref(true);
 const loading = ref(false);
 
 const loadSongs = async (isInit = false) => {
+  console.log("call load")
   if (!hasMore.value || loading.value) return;
   loading.value = true;
-
+  console.log("call load2")
   try {
     const ts =
       isInit || songList.value.length === 0
@@ -31,7 +32,12 @@ const loadSongs = async (isInit = false) => {
     if (songs.length === 0) {
       hasMore.value = false;
     } else {
-      songList.value.push(...songs);
+      if (isInit) {
+        songList.value=songs;
+      }else{
+        songList.value.push(...songs);
+      }
+      
     }
   } catch (err) {
     showFailToast("加载失败");
@@ -42,10 +48,7 @@ const loadSongs = async (isInit = false) => {
 
 onMounted(async () => {
   if (!userStore.isLogin) {
-    router.replace({
-      path: "/login",
-      query: { redirect: "/profile" }
-    });
+    router.replace("/login");
   } else {
     const res = await getProfile();
     nickName.value = res.nickName;
@@ -145,30 +148,59 @@ function downloadMusic(url: string, filename: string = "music.mp3") {
   link.click();
   document.body.removeChild(link);
 }
+
+
+const toggleRelease = async (post: UserSong) => {
+  const newStatus = post.releaseStatus === 1 ? 0 : 1;
+  try {
+    await updateRelease({ "id": post.id, "releaseStatus": newStatus });
+    showSuccessToast(newStatus === 1 ? "已公开" : "已隐藏");
+    const songs = await getMySongs( {});
+    songList.value=songs;
+  } catch (e) {
+    showFailToast("操作失败");
+  }
+};
+
+function logout() {
+  userStore.logout(); // 清空用户信息
+  router.replace("/login");
+}
 </script>
 
 <template>
   <div class="min-h-screen bg-[var(--color-page-background)]">
     <!-- 顶部背景图 + 头像 -->
     <div class="relative">
-      <img src="~@/assets/user_ba.jpg" class="w-full h-[160px] object-cover" />
+      <img src="https://static.deeptok.top/user_ba.jpg" class="w-full h-[160px] object-cover" />
     </div>
 
     <!-- 用户卡片 -->
     <div
       class="bg-[var(--color-block-background)] rounded-[12px] mx-[12px] p-[16px] shadow -mt-[40px] relative z-10"
     >
+            <div style="float:right">
+          <van-icon
+  name="revoke"
+  class=" top-[12px] right-[12px] text-gray-500"
+  size="15"
+  @click="logout"
+/>
+          </div>
       <div class="flex items-center space-x-[12px]">
         <img
-          src="~@/assets/user_ba.jpg"
+          src="https://static.deeptok.top/user_ba.jpg"
           class="w-[64px] h-[64px] rounded-full border border-[var(--color-border)]"
         />
         <div class="flex-1">
           <div class="font-bold text-[18px]">{{ nickName }}</div>
+          
           <div class="text-[12px] text-gray-500">
             {{ signature }}
           </div>
+          
         </div>
+
       </div>
 
       <div class="flex justify-around mt-[16px] text-center text-[12px]">
@@ -192,6 +224,7 @@ function downloadMusic(url: string, filename: string = "music.mp3") {
         >
         <van-button type="default" block>购买积分</van-button>
       </div>
+      
     </div>
 
     <!-- Tabs -->
@@ -225,13 +258,24 @@ function downloadMusic(url: string, filename: string = "music.mp3") {
             @click="goToDetail(post.id)"
             class="flex items-center space-x-[8px] mb-[8px]"
           >
+          
             <img :src="post.imageUrl" class="w-[32px] h-[32px] rounded-full" />
-            <div>
-              <div class="text-[14px] font-medium">{{ post.title }}</div>
-              <div class="text-[12px] text-gray-400">
-                {{ new Date(post.createTime).toLocaleString() }} 创作
-              </div>
-            </div>
+            
+            <!-- 中间：标题 + 时间 -->
+  <div class="flex-1">
+    <div class="flex items-center">
+      <span class="text-[14px] font-medium mr-[6px]">{{ post.title }}</span>
+      <span
+        :class="[
+          'w-[8px] h-[8px] rounded-full',
+          post.releaseStatus === 1 ? 'bg-green-500' : 'bg-red-500'
+        ]"
+      ></span>
+    </div>
+    <div class="text-[12px] text-gray-400">
+      {{ new Date(post.createTime).toLocaleString() }} 创作
+    </div>
+  </div>
           </div>
 
           <div
@@ -242,6 +286,13 @@ function downloadMusic(url: string, filename: string = "music.mp3") {
           </div>
 
           <div class="flex justify-around text-[13px] text-gray-500 mt-[8px]">
+            <div
+    @click.stop="toggleRelease(post)"
+    class="flex items-center space-x-1"
+  >
+    <van-icon :name="post.releaseStatus === 1 ? 'closed-eye' : 'guide-o'" />
+    <span>{{ post.releaseStatus === 1 ? '隐藏' : '公开' }}</span>
+  </div>
             <div
               @click.stop="sharePost(post.id)"
               class="flex items-center space-x-1"

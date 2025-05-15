@@ -35,9 +35,9 @@ async function generateMusic() {
         ? "" // 默认AI模型的ID
         : selectedModel.value!.id
   };
-  //const orderId = await createMusic(params);
+  const orderId = await createMusic(params);
   //313079579228540928
-  const orderId ="313079579228540928" ;
+  //const orderId ="313079579228540928" ;
   musicGroupId.value = orderId.toString();
    console.log("click3")
 }
@@ -45,9 +45,7 @@ async function generateMusic() {
 const selectedModel = ref<{ id: string; modelName: string } | null>(null);
 const selectedModelName = ref(""); // 用于显示在字段中
 const customModels = [
-  { id: "model_a", modelName: "模型A" },
-  { id: "model_b", modelName: "模型B" },
-  { id: "model_c", modelName: "模型C" }
+
 ];
 function onSelectModel({ name, index }: { name: string; index: number }) {
   const model = customModels[index];

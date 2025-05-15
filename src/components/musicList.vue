@@ -197,7 +197,7 @@ function startPolling(id: string | number) {
   stopPolling();
   pollingTimer = setInterval(() => {
     fetchMusicList(id);
-  }, 3000);
+  }, 5000);
   fetchMusicList(id);
 }
 

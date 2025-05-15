@@ -52,12 +52,17 @@ async function onLogin() {
   <GridPatternDashed />
 
   <div class="px-[24px] pt-[60px] pb-[40px]">
-    <img
-      src="~@/assets/logo_melomini.png"
-      alt="Logo"
-      class="block w-[100px] mx-auto mb-[30px]"
-    />
-
+   <!-- 替换后 -->
+<div class="flex justify-center mb-[16px]">
+  <img
+    src="https://static.deeptok.top/logo_melomini.png"
+    alt="网站 Logo"
+    class="w-[160px] h-auto max-h-[60px] object-contain"
+  />
+</div>
+<div class="text-center text-[16px] font-semibold text-[var(--color-text)] mb-[24px]">
+  发现让你感动的声音
+</div>
     <div
       class="bg-[var(--color-block-background)] p-[20px] rounded-[12px] shadow"
     >
