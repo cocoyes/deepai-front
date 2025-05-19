@@ -72,6 +72,12 @@ function onSelectModel({ name, index }: { name: string; index: number }) {
         <van-button type="primary" block @click="generateMusic">
           生成音乐
         </van-button>
+        <div
+  class="text-right text-sm text-[#1989fa] mt-[22px] pr-[6px]"
+  @click="$router.push('/model-create')"
+>
+  想唱出自己的声音?前往训练>>
+</div>
       </van-tab>
 
       <van-tab title="自定义模型">
@@ -109,6 +115,14 @@ function onSelectModel({ name, index }: { name: string; index: number }) {
         <van-button type="primary" block @click="generateMusic">
           生成音乐
         </van-button>
+
+        <!-- 生成音乐按钮下方的提示链接 -->
+<div
+  class="text-right text-sm text-[#1989fa] mt-[22px] pr-[6px]"
+  @click="$router.push('/model-create')"
+>
+  没有自定义模型?前往训练>>
+</div>
       </van-tab>
     </van-tabs>
     <MusicList v-if="musicGroupId" :id="musicGroupId" class="mt-[20px]" />

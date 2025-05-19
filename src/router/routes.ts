@@ -69,6 +69,15 @@ const routes: Array<RouteRecordRaw> = [
           title: "音乐播放",
           noCache: true
         }
+      },
+      {
+        path: "model-create",
+        name: "TrainModel",
+        component: () => import("@/views/creator/trainModel.vue"),
+        meta: {
+          title: "模型训练",
+          noCache: true
+        }
       }
     ]
   }

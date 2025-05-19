@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => {
       // doc: https://github.com/pengzhanbo/vite-plugin-mock-dev-server
       proxy: {
         "^/ai-api": {
-          target: "http://127.0.0.1:9088"
+          target: "http://127.0.0.1:9085"
         }
       }
     },
